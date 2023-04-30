@@ -1,0 +1,1129 @@
+openapi: 3.0.3
+info:
+  title: ECHO app- OpenAPI 3.0
+  description: |-
+    This is a sample echo app Server based on the OpenAPI 3.0 specification
+    You can now help us improve the API whether it's by making changes to the definition itself or to the code.
+    That way, with time, we can improve the API in general, and expose some of the new features to echo
+    This is rough implementaion of api, it may change over the future and some new functionality maybe added to provide a great user experience
+    
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: harshitguptaiitdcs@gmail.com
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: http://localhost:8000
+
+tags:
+  - name: users
+    description: Everything about user
+    externalDocs:
+      description: Find out more
+      url: http://swagger.io
+  - name: comments
+    description: everything there is to comments
+    externalDocs:
+      description: Find out more about our store
+      url: http://swagger.io
+  - name: chats
+    description: everything there is to chat function
+    externalDocs:
+      description: Find out more about our store
+      url: http://swagger.io
+  - name: posts
+    description: everything there is to posts
+    externalDocs:
+      description: everything there is with posts
+      url: http://swagger.io
+  - name: upvotes and downvotes
+    description: everything there is to posts
+    externalDocs:
+      description: likes and dislikes in a post
+      url: http://swagger.io
+paths:
+  /users/{user_id}/chats:
+    get:
+      tags:
+        - users
+      summary: Get all chats for a user
+      description: Returns a list of all chats for the specified user.
+      parameters:
+        - name: user_id
+          in: path
+          description: ID of the user whose chats to retrieve
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: A list of chats for the specified user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Chat'
+    post:
+      tags:
+        - users
+      summary: Create a new chat between two users
+      description: Creates a new chat between two users and returns the chat ID.
+      parameters:
+        - name: user_id
+          in: path
+          description: ID of the user creating the chat
+          required: true
+          schema:
+            type: integer
+        - name: other_user_id
+          in: query
+          description: ID of the other user in the chat
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: The text of the first message in the chat
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                chat_text:
+                  type: string
+                  example: "Hello, how are you?"
+      responses:
+        '201':
+          description: The ID of the new chat
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  chat_id:
+                    type: integer
+                    example: 123
+  /chats/{chat_id}:
+    get:
+      tags:
+        - chats   
+      summary: Get a chat by ID
+      description: Returns the chat with the specified ID.
+      parameters:
+        - name: chat_id
+          in: path
+          description: ID of the chat to retrieve
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: The chat with the specified ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chat'
+    post:
+      tags:
+        - chats
+      summary: Send a message in a chat
+      description: Sends a message in the specified chat.
+      parameters:
+        - name: chat_id
+          in: path
+          description: ID of the chat to send the message in
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: The text of the message to send
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                chat_text:
+                  type: string
+                  example: "I'm doing well, thanks for asking!"
+      responses:
+        '201':
+          description: The ID of the new message
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message_id:
+                    type: integer
+                    example: 456
+  /posts:
+    get:
+      tags:
+        - posts
+      summary: Get a list of all posts
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+    post:
+      tags:
+        - posts
+      summary: Create a new post
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                post_text:
+                  type: string
+                post_image:
+                  type: string
+                  format: binary
+                user_id:
+                  type: integer
+              required:
+                - post_text
+                - post_image
+                - user_id
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+  /posts/{post_id}:
+    get:
+      tags:
+        - posts
+      summary: Get the details of a specific post
+      parameters:
+        - name: post_id
+          in: path
+          required: true
+          description: The ID of the post to retrieve
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+    put:
+      tags:
+        - posts
+      summary: Update the details of a specific post
+      parameters:
+        - name: post_id
+          in: path
+          required: true
+          description: The ID of the post to update
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                post_text:
+                  type: string
+                post_image:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+    delete:
+      tags:
+        - posts
+      summary: Delete a specific post
+      parameters:
+        - name: post_id
+          in: path
+          required: true
+          description: The ID of the post to delete
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: No Content
+          
+  /posts/user/{user_id}:
+    get:
+      tags:
+        - posts
+      summary: Get all the posts from the following of the given user_id.
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          description: The ID of the user whose home page to be created.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+                
+  /posts/{tag}:
+    get:
+      tags:
+        - posts
+      summary: Get all the posts according to tag.
+      parameters:
+        - name: tag
+          in: path
+          required: true
+          description: The ID of the user whose home page to be created.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+                
+                
+  /posts/mypost/{user_id}:
+    get:
+      tags:
+        - posts
+      summary: Get all the posts according to tag.
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          description: The ID of the user whose home page to be created.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+  /comments:
+    get:
+      tags:
+        - comments
+      summary: Get all comments
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+    post:
+      tags:
+        - comments
+      summary: Add a new comment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Comment'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+
+  /comments/posts/{post_id}:
+    get:
+      tags:
+        - comments
+      summary: Get comments for a specific post
+      parameters:
+        - name: post_id
+          in: path
+          required: true
+          description: The ID of the post where comment is given
+          schema:
+            type: integer
+      #  - $ref: '#/components/parameters/post_id'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+
+  /comments/users/{user_id}:
+    get:
+      tags:
+        - comments
+      summary: Get comments by a specific user
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          description: The ID of the user which is giving the comment
+          schema:
+            type: integer
+ #       - $ref: '#/components/parameters/user_id'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+
+  /comments/posts/{post_id}/users/{user_id}:
+    get:
+      tags:
+        - comments
+      summary: Get comments for a specific post by a specific user
+      parameters:
+        - name: post_id
+          in: path
+          required: true
+          description: The ID of the post where comment is given
+          schema:
+            type: integer
+        - name: user_id
+          in: path
+          required: true
+          description: The ID of the user who is giving the comment 
+          schema:
+            type: integer
+#        - $ref: '#/components/parameters/post_id'
+#        - $ref: '#/components/parameters/user_id'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+  /upvotes:
+    get:
+      tags:
+        - upvotes and downvotes
+      summary: Get all upvotes
+      description: Retrieves a list of all upvotes in the system
+  
+      responses:
+        200:
+          description: List of upvotes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Upvote'
+
+    post:
+      tags:
+        - upvotes and downvotes
+      summary: Create a new upvote
+      description: Creates a new upvote in the system
+      requestBody:
+        description: Upvote object that needs to be added to the system
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Upvote'
+      responses:
+        201:
+          description: Upvote created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Upvote'
+        400:
+          description: Invalid request body
+
+  /upvotes/{upvote_id}:
+    get:
+      tags:
+        - upvotes and downvotes
+      summary: Get a specific upvote by ID
+      description: Retrieves a specific upvote by its ID
+      parameters:
+        - name: upvote_id
+          in: path
+          description: ID of the upvote to retrieve
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        200:
+          description: Upvote found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Upvote'
+        404:
+          description: Upvote not found
+
+    put:
+      tags:
+        - upvotes and downvotes
+      summary: Update a specific upvote by ID
+      description: Updates a specific upvote by its ID
+      parameters:
+        - name: upvote_id
+          in: path
+          description: ID of the upvote to update
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        description: Upvote object that needs to be updated in the system
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Upvote'
+      responses:
+        200:
+          description: Upvote updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Upvote'
+        400:
+          description: Invalid request body
+        404:
+          description: Upvote not found
+
+    delete:
+      tags:
+        - upvotes and downvotes
+      summary: Delete a specific upvote by ID
+      description: Deletes a specific upvote by its ID
+      parameters:
+        - name: upvote_id
+          in: path
+          description: ID of the upvote to delete
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        204:
+          description: Upvote deleted
+        404:
+          description: Upvote not found
+
+  /upvotes/posts/{post_id}:
+    get:
+      tags:
+        - upvotes and downvotes
+      summary: Get all upvotes for a specific post
+      description: Retrieves a list of all upvotes for a specific post in the system
+      parameters:
+        - name: post_id
+          in: path
+          description: ID of the post to retrieve upvotes for
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: List of upvotes for the specified post
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Upvote'
+        404:
+          description: Post not found
+  /downvotes:
+    get:
+      tags:
+        - upvotes and downvotes
+      summary: Get all downvotes
+      description: Retrieves a list of all downvotes in the system
+  
+      responses:
+        200:
+          description: List of downvotes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/downvote'
+
+    post:
+      tags:
+        - upvotes and downvotes
+      summary: Create a new downvote
+      description: Creates a new downvote in the system
+      requestBody:
+        description: downvote object that needs to be added to the system
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/downvote'
+      responses:
+        201:
+          description: Upvote created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/downvote'
+        400:
+          description: Invalid request body
+
+  /downvotes/{downvote_id}:
+    get:
+      tags:
+        - upvotes and downvotes
+      summary: Get a specific downvote by ID
+      description: Retrieves a specific downvote by its ID
+      parameters:
+        - name: downvote_id
+          in: path
+          description: ID of the downvote to retrieve
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        200:
+          description: downvote found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/downvote'
+        404:
+          description: downvote not found
+
+    put:
+      tags:
+        - upvotes and downvotes
+      summary: Update a specific downvote by ID
+      description: Updates a specific downvote by its ID
+      parameters:
+        - name: downvote_id
+          in: path
+          description: ID of the downvote to update
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        description: downvote object that needs to be updated in the system
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/downvote'
+      responses:
+        200:
+          description: downvote updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/downvote'
+        400:
+          description: Invalid request body
+        404:
+          description: downvote not found
+
+    delete:
+      tags:
+        - upvotes and downvotes
+      summary: Delete a specific downvote by ID
+      description: Deletes a specific downvote by its ID
+      parameters:
+        - name: downvote_id
+          in: path
+          description: ID of the downvote to delete
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        204:
+          description: downvote deleted
+        404:
+          description: downvote not found
+
+  /downvotes/posts/{post_id}:
+    get:
+      tags:
+        - upvotes and downvotes
+      summary: Get all downvotes for a specific post
+      description: Retrieves a list of all downvotes for a specific post in the system
+      parameters:
+        - name: post_id
+          in: path
+          description: ID of the post to retrieve upvotes for
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: List of downvotes for the specified post
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Upvote'
+        404:
+          description: Post not found
+  /users:
+    get:
+      tags:
+        - users
+      summary: Get a list of all users
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    post:
+      tags:
+        - users
+      summary: Create a new user
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                dob:
+                  type: string
+                  format: date
+                email:
+                  type: string
+                  format: email
+                profile_pic:
+                  type: string
+                  format: binary
+              required:
+                - username
+                - password
+                - dob
+                - email
+                - profile_pic
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+  /users/{user_id}:
+    get:
+      tags:
+        - users
+      summary: Get the details of a specific user
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          description: The ID of the user to retrieve
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    put:
+      tags:
+        - users
+      summary: Update the details of a specific user
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          description: The ID of the user to update
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                dob:
+                  type: string
+                  format: date
+                email:
+                  type: string
+                  format: email
+                profile_pic:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    delete:
+      tags:
+        - users
+      summary: Delete a specific user
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          description: The ID of the user to delete
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '204':
+          description: No Content
+
+
+  /users/{user_id}/saved_posts:
+    get:
+      tags:
+        - users
+      summary: Get the details of a all saved post
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          description: The ID of the user to retrieve
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+  /users/{user_id}/saved_posts/{post_id}:
+    get:
+      tags:
+        - users
+      summary: Get the details of a specific saved post by user saved post
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          description: The ID of the user to retrieve
+          schema:
+            type: integer
+            minimum: 1
+        - name: post_id
+          in: path
+          required: true
+          description: The ID of the post to retrieve
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    delete:
+      tags:
+        - users
+      summary: Delete a specific saved post
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          description: The ID of the user to delete
+          schema:
+            type: integer
+            minimum: 1
+        - name: post_id
+          in: path
+          required: true
+          description: The ID of the post to retrieve
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '204':
+          description: No Content
+  /users/login:
+    get:
+      tags:
+        - users
+      summary: Logs user into the system
+      description: ''
+      operationId: loginUser
+      parameters:
+        - name: username
+          in: query
+          description: The user name for login
+          required: false
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: The password for login in clear text
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          headers:
+            X-Rate-Limit:
+              description: calls per hour allowed by the user
+              schema:
+                type: integer
+                format: int32
+            X-Expires-After:
+              description: date in UTC when token expires
+              schema:
+                type: string
+                format: date-time
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Invalid username/password supplied
+  /user/logout:
+    get:
+      tags:
+        - users
+      summary: Logs out current logged in user session
+      description: ''
+      operationId: logoutUser
+      parameters: []
+      responses:
+        default:
+          description: successful operation
+
+ 
+components:
+  schemas:
+    Chat:
+      type: object
+      properties:
+        chat_id:
+          type: integer
+          example: 123
+        user_id1:
+          type: integer
+          example: 1
+        user_id2:
+          type: integer
+          example: 2
+        messages:
+          type: array
+          items:
+            type: string
+            
+      required:
+        - chat_id
+        - user_id1
+        - user_id2
+        - messages
+    Post:
+      type: object
+      properties:
+        post_id:
+          type: integer
+        post_time:
+          type: string
+          format: date-time
+        user_id:
+          type: integer
+        post_text:
+          type: string
+        post_image:
+          type: string
+          format: binary
+        upvotes:
+          type: integer
+        downvotes:
+          type: integer
+        comments:
+          type: array
+          items:
+            type: object
+            properties:
+              comment_id:
+                type: integer
+              comment_text:
+                type: string
+              user_id:
+                type: integer
+              comment_time:
+                type: string
+                format: date-time
+      required:
+        - post_id
+        - post_time
+        - user_id
+        - post_text
+        - upvotes
+        - downvotes
+    Comment:
+      type: object
+      properties:
+        post_id:
+          type: integer
+          minimum: 1
+        comment_id:
+          type: integer
+          minimum: 1
+        user_id:
+          type: integer
+          minimum: 1
+        comment_text:
+          type: string
+      required:
+        - post_id
+        - comment_id
+        - user_id
+        - comment_text
+    Upvote:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The unique identifier for the upvote
+        user_id:
+          type: integer
+          description: The ID of the user who created the upvote
+        post_id:
+          type: integer
+          description: The ID of the post that was upvoted
+        upvote_id:
+          type: integer
+          description: The ID of the comment that was upvoted
+      required:
+        - id
+        - user_id
+        - post_id
+        - upvote_id
+    downvote:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The unique identifier for the downvote
+        user_id:
+          type: integer
+          description: The ID of the user who created the downvote
+        post_id:
+          type: integer
+          description: The ID of the post that was downvoted
+        upvote_id:
+          type: integer
+          description: The ID of the comment that was downvoted
+      required:
+        - id
+        - user_id
+        - post_id
+        - downvote_id
+    User:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          minimum: 1
+        username:
+          type: string
+        password:
+          type: string
+        dob:
+          type: string
+          format: date
+        email:
+          type: string
+          format: email
+        profile_pic:
+          type: string
+          format: binary
+        follower_list:
+          type: array
+          items: 
+            type: integer
+        following_list:
+          type: array
+          items:
+            type: integer
+            
+        saved_posts:
+          type: array
+          items:
+            type: integer
+      required:
+        - user_id
+        - username
+        - password
+        - dob
+        - email
+        - profile_pic
+        - follower_list
+        - following_list
+        - saved_posts
